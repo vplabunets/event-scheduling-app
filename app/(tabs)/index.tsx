@@ -37,7 +37,6 @@ export default function HomeScreen() {
   const [openWeekItems, setOpenWeekItems] = useState(false);
   const [timeOption, setTimeOption] = useState(timeOptions);
   const [weekItems, setWeekItems] = useState(weekOptions);
-  const [displayedDates, setDisplayedDates] = useState();
   const [storedEventsToDisplay, setStoredEventsToDisplay] = useState<{ [key: string]: MarkedDate }>({});
 
   const [selectedEvent, setSelectedEvent] = useState<Event>();
@@ -51,6 +50,7 @@ export default function HomeScreen() {
     formState: { errors },
     reset,
     setValue,
+    getValues,
   } = useForm({
     defaultValues: initialEventState,
   });
@@ -58,15 +58,13 @@ export default function HomeScreen() {
   const storedEvents = useSelector((state: RootState) => state.event.events);
 
   useEffect(() => {
-    const updatedMarkedDates: {
-      [key: string]: {};
-    } = storedEvents.reduce((acc, event) => {
+    const updatedMarkedDates: { [key: string]: MarkedDate } = storedEvents.reduce((acc, event) => {
       acc[event.startsDate] = {
         id: event.id,
         selectedColor: 'orange',
       };
       return acc;
-    }, {} as { [key: string]: {} });
+    }, {} as { [key: string]: MarkedDate });
 
     setStoredEventsToDisplay(updatedMarkedDates);
   }, [storedEvents]);
@@ -87,7 +85,7 @@ export default function HomeScreen() {
       setValue('startsDate', '');
       setValue('endsDate', '');
     }
-  }, [markedDates, setDisplayedDates, selectedEvent, storedEventsToDisplay]);
+  }, [markedDates, selectedEvent, storedEventsToDisplay]);
 
   const onSubmit = (data: FormData) => {
     const sD = new Date(data.startsDate);
@@ -103,6 +101,7 @@ export default function HomeScreen() {
       const modifiedData: Event = {
         ...data,
         id: selectedEvent.id,
+        recurrence: data.recurrence as Recurrence,
       };
       dispatch(modifyEvent(modifiedData));
       reset(initialEventState);
@@ -134,6 +133,8 @@ export default function HomeScreen() {
             ...data,
             startsDate: newStartDate.toISOString().split('T')[0],
             id: id,
+            recurrence: data.recurrence as Recurrence,
+            s,
           };
           dispatch(addEvent(eventData));
           reset(initialEventState);
@@ -146,7 +147,6 @@ export default function HomeScreen() {
   const onDayPress = (day: any) => {
     if (Object.keys(storedEventsToDisplay).includes(day.dateString)) {
       const selectedEvent = storedEvents.find((ev) => ev.startsDate === day.dateString);
-      console.log('selectedEvent in on day', selectedEvent);
       if (selectedEvent) {
         Object.keys(selectedEvent).forEach((key) => {
           setValue('eventName', selectedEvent.eventName);
@@ -386,7 +386,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <StyledButton
-          //   disabled={getValues('eventName') === '' || getValues('endsTime') === '' || getValues('startsTime') === ''}
+          disabled={getValues('eventName') === '' || getValues('endsTime') === '' || getValues('startsTime') === ''}
           height={40}
           style={styles.button}
           color='#FFF'

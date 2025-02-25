@@ -15,7 +15,7 @@ export interface Event {
   endsDate: string;
   endsTime: string;
   eventName: string;
-  recurrence: string;
+  recurrence: Recurrence;
   startsDate: string;
   startsTime: string;
 }
@@ -24,6 +24,7 @@ export type EventFields = Omit<Event, 'id'>;
 
 export interface MarkedDate {
   selectedColor: string;
+  id: string;
 }
 
 export enum RecurrenceStep {
@@ -36,4 +37,16 @@ export enum Recurrence {
   WEEKLY = 'weekly',
   BIWEEKLY = 'bi-weekly',
   MONTHLY = 'monthly',
+}
+
+export interface DDPickerProps {
+  open: boolean;
+  items: { label: string; value: string }[];
+  value: string | null;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setPickedValue: (value: string | null) => void;
+  onChangeValue?: (value: string | null) => void;
+  setItems: React.Dispatch<React.SetStateAction<{ label: string; value: string }[]>>;
+  placeholder?: string;
+  customStyles?: object;
 }

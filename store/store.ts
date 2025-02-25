@@ -3,7 +3,6 @@ import eventSlice from './event/eventSlice';
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import storage from 'redux-persist/lib/storage';
 
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist/es/constants';
 
@@ -14,7 +13,7 @@ const eventPersistConfig = {
 };
 
 const rootReducer = combineReducers({
-  event: persistReducer(eventPersistConfig, eventSlice), // Має бути `event`
+  event: persistReducer(eventPersistConfig, eventSlice),
 });
 
 const store = configureStore({

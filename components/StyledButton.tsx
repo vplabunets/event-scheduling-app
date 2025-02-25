@@ -1,16 +1,6 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  FlexAlignType,
-  FlexStyle,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { ImagePropsBase } from 'react-native';
-// import {filterStyles} from '@utils/filterStyle';
-// import {useTheme} from '@components/navigation/providers/ThemeProvider/useTheme';
 import { filterStyles } from '@/utils/filterStyle';
 import StyledText from './StyledText';
 
@@ -37,8 +27,6 @@ interface Props {
   fontWeight?: 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 }
 const StyledButton: React.FC<Props> = (props) => {
-  // const {colors} = useTheme();
-
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -86,7 +74,6 @@ const StyledButton: React.FC<Props> = (props) => {
       {props.isLoading && <ActivityIndicator color={'black'} />}
       {!props.isLoading && props.title != '' && (
         <StyledText
-          // color={props.disabled ? colors.buttonDisabledText : props.color || colors.buttonText}
           color={props.disabled ? 'grey ' : props.color || '#fff'}
           lineHeight={0}
           fontFamily='Poppins-SemiBold'

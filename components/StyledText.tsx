@@ -3,7 +3,6 @@ import { Text, StyleProp, TextStyle, StyleSheet, TouchableOpacity } from 'react-
 import { filterStyles } from '../utils/filterStyle';
 import { FontWeight } from '../types/global.type';
 import { RFValue } from 'react-native-responsive-fontsize';
-// import {useTheme} from '@components/navigation/providers/ThemeProvider/useTheme';
 
 export interface StyledTextProps {
   children: ReactNode;

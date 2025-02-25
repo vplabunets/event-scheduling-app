@@ -1,50 +1,77 @@
-# Welcome to your Expo app 👋
+# Calendar Event Scheduling App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Description
 
-## Get started
+This is a mobile scheduling application that allows users to create, manage, and repeat events. The app provides an
+intuitive interface for users to schedule events, choose recurrence options, and manage event details.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- **Create Events**: Users can create new events by entering an event name, setting a start time, and choosing a
+  recurrence option.
+- **Edit Events**: Users can modify the name, recurrence, or time of existing events.
+- **Delete Events**: Users can remove events by clicking on a delete button.
+- **Recurrence Options**:
+  - Weekly: The event recurs every week.
+  - Bi-weekly: The event recurs every other week.
+  - Monthly: The event recurs every month.
+- **Save Events**: Users must click the “Save” button to confirm event creation.
+- **Event Storage**: Events are stored locally, ensuring past data is retained when the app is restarted.
+- **Highlight Scheduled Dates**: Dates with scheduled events are highlighted in the calendar.
 
-2. Start the app
+## Requirements
 
-   ```bash
-    npx expo start
-   ```
+- **Tech Stack**:
+  - React Native (Expo)
+  - React State Management or Redux
+  - Libraries to simplify your work
+  - The application should function properly across all Expo-supported platforms: iOS, Android, and Web.
 
-In the output, you'll find options to open the app in a
+## Installation
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Navigate to the project directory and install dependencies.
 
 ```bash
-npm run reset-project
+cd event-scheduling-app
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Running the App
 
-## Learn more
+- **iOS:**
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm run ios
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Android:**
 
-## Join the community
+```bash
+npm run android
+```
 
-Join our community of developers creating universal apps.
+- **Web:**
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm run web
+```
+
+## How to Use
+
+1. Open the app and select a date on the calendar to create or edit an event.
+2. Enter the event name, set a start time, and choose a recurrence option.
+3. Click “Save” to store the event.
+4. You can view and manage events by clicking on highlighted dates.
+
+## Code Structure
+
+- `HomeScreen.ts`: Main screen with the calendar and event management functionalities.
+- `eventSlice.ts`: Redux slice for managing event data.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Contact
+
+vplabunets@gmail.com Volodymyr Labunets

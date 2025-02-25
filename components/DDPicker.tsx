@@ -2,17 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-interface DDPickerProps {
-  open: boolean;
-  items: { label: string; value: string }[];
-  value: string | null;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setPickedValue: (value: string | null) => void;
-  onChangeValue?: (value: string | null) => void;
-  setItems: React.Dispatch<React.SetStateAction<{ label: string; value: string }[]>>;
-  placeholder?: string;
-  customStyles?: object;
-}
+import { DDPickerProps } from '@/types/global.type';
 
 const DDPicker: React.FC<DDPickerProps> = ({
   open,
