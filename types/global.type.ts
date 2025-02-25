@@ -23,7 +23,17 @@ export interface Event {
 export type EventFields = Omit<Event, 'id'>;
 
 export interface MarkedDate {
-  disableTouchEvent: boolean;
-  selected: boolean;
   selectedColor: string;
+}
+
+export enum RecurrenceStep {
+  WEEKLY = 7,
+  BIWEEKLY = 14,
+  MONTHLY = 30,
+}
+
+export enum Recurrence {
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'bi-weekly',
+  MONTHLY = 'monthly',
 }

@@ -17,7 +17,9 @@ const eventSlice = createSlice({
     modifyEvent: (state, { payload }: PayloadAction<Event>) => {
       console.log('payload in slice modifyEvent', payload);
 
-      const index = state.events.findIndex((event) => event.id === payload.id);
+      const index = state.events.findIndex(
+        (event) => event.id === payload.id && event.startsDate === payload.startsDate
+      );
 
       if (index !== -1) {
         state.events[index] = payload;
@@ -25,8 +27,10 @@ const eventSlice = createSlice({
         console.log('Event not found');
       }
     },
-    deleteEvent: (state, { payload }: PayloadAction<string>) => {
-      state.events = state.events.filter((event) => event.id !== payload);
+    deleteEvent: (state, { payload }: PayloadAction<{ id: string; startsDate: string }>) => {
+      state.events = state.events.filter(
+        (event) => !(event.id === payload.id && event.startsDate === payload.startsDate)
+      );
     },
   },
 });
