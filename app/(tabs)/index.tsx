@@ -94,10 +94,11 @@ export default function HomeScreen() {
     const differenceInTime = eD.getTime() - sD.getTime();
     const differenceInDays = differenceInTime / (1000 * 60 * 60 * 24);
 
-    if (
+    const isEventModified =
       selectedEvent &&
-      storedEvents.find((event) => event.id === selectedEvent.id && event.startsDate === selectedEvent.startsDate)
-    ) {
+      storedEvents.some((event) => event.id === selectedEvent.id && event.startsDate === selectedEvent.startsDate);
+
+    if (isEventModified) {
       const modifiedData: Event = {
         ...data,
         id: selectedEvent.id,
@@ -134,7 +135,6 @@ export default function HomeScreen() {
             startsDate: newStartDate.toISOString().split('T')[0],
             id: id,
             recurrence: data.recurrence as Recurrence,
-            s,
           };
           dispatch(addEvent(eventData));
           reset(initialEventState);
@@ -218,9 +218,7 @@ export default function HomeScreen() {
       />
       <View style={{ gap: 10, flex: 1, marginTop: 10 }}>
         <View style={{ marginBottom: 10 }}>
-          <View
-            style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-          >
+          <View style={styles.screenTitle}>
             <StyledText fontSize={12} fontWeight='600'>
               Event Name
             </StyledText>
@@ -384,7 +382,6 @@ export default function HomeScreen() {
             Create New Event
           </StyledText>
         </TouchableOpacity>
-
         <StyledButton
           disabled={getValues('eventName') === '' || getValues('endsTime') === '' || getValues('startsTime') === ''}
           height={40}
@@ -407,10 +404,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  screenTitle: {
     marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   calendar: {
     padding: 0,

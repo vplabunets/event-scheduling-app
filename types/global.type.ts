@@ -30,7 +30,7 @@ export interface MarkedDate {
 export enum RecurrenceStep {
   WEEKLY = 7,
   BIWEEKLY = 14,
-  MONTHLY = 30,
+  MONTHLY = 28,
 }
 
 export enum Recurrence {
@@ -46,7 +46,7 @@ export interface DDPickerProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setPickedValue: (value: string | null) => void;
   onChangeValue?: (value: string | null) => void;
-  setItems: React.Dispatch<React.SetStateAction<{ label: string; value: string }[]>>;
+  setItems: React.Dispatch<React.SetStateAction<any[]>>;
   placeholder?: string;
   customStyles?: object;
 }
