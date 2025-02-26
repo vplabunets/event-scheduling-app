@@ -15,6 +15,14 @@ const DDPicker: React.FC<DDPickerProps> = ({
   placeholder,
   customStyles,
 }) => {
+  const handleSetValue = (callback: any) => {
+    const selectedValue = typeof callback === 'function' ? callback(value) : callback;
+    setPickedValue(selectedValue);
+    if (onChangeValue) {
+      onChangeValue(selectedValue);
+    }
+  };
+
   return (
     <DropDownPicker
       open={open}
@@ -22,13 +30,7 @@ const DDPicker: React.FC<DDPickerProps> = ({
       items={items}
       setOpen={setOpen}
       maxHeight={400}
-      setValue={(callback) => {
-        const selectedValue = typeof callback === 'function' ? callback(value) : callback;
-        setPickedValue(selectedValue);
-        if (onChangeValue) {
-          onChangeValue(selectedValue);
-        }
-      }}
+      setValue={handleSetValue}
       setItems={setItems}
       style={[styles.main, customStyles]}
       dropDownContainerStyle={styles.dropDownContainer}

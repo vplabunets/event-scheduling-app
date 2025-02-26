@@ -16,6 +16,7 @@ import StyledText from '@/components/StyledText';
 import { timeOptions } from '@/constants/timeOptions';
 import { weekOptions } from '@/constants/weekOption';
 import { FormData, MarkedDate, Event, Recurrence, RecurrenceStep } from '@/types/global.type';
+import ErrorMessage from '@/components/ErrorMessage';
 
 const initialEventState = {
   eventName: '',
@@ -29,9 +30,6 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
   const today = new Date().toISOString().split('T')[0];
 
-  const [markedDates, setMarkedDates] = useState<{
-    [key: string]: {};
-  }>({});
   const [openStartTime, setOpenStartTime] = useState(false);
   const [openEndTime, setOpenEndTime] = useState(false);
   const [openWeekItems, setOpenWeekItems] = useState(false);
@@ -43,6 +41,10 @@ export default function HomeScreen() {
 
   const [firstDay, setFirstDay] = useState('');
   const [lastDay, setLastDay] = useState('');
+  const [markedDates, setMarkedDates] = useState<{
+    [key: string]: {};
+  }>({});
+  const storedEvents = useSelector((state: RootState) => state.event.events);
 
   const {
     control,
@@ -54,8 +56,6 @@ export default function HomeScreen() {
   } = useForm({
     defaultValues: initialEventState,
   });
-
-  const storedEvents = useSelector((state: RootState) => state.event.events);
 
   useEffect(() => {
     const updatedMarkedDates: { [key: string]: MarkedDate } = storedEvents.reduce((acc, event) => {
@@ -88,12 +88,6 @@ export default function HomeScreen() {
   }, [markedDates, selectedEvent, storedEventsToDisplay]);
 
   const onSubmit = (data: FormData) => {
-    const sD = new Date(data.startsDate);
-    const eD = new Date(data.endsDate);
-
-    const differenceInTime = eD.getTime() - sD.getTime();
-    const differenceInDays = differenceInTime / (1000 * 60 * 60 * 24);
-
     const isEventModified =
       selectedEvent &&
       storedEvents.some((event) => event.id === selectedEvent.id && event.startsDate === selectedEvent.startsDate);
@@ -114,32 +108,9 @@ export default function HomeScreen() {
         data.recurrence === Recurrence.BIWEEKLY ||
         data.recurrence === Recurrence.MONTHLY
       ) {
-        let recurrenceStep: number;
-        if (data.recurrence === Recurrence.WEEKLY) {
-          recurrenceStep = RecurrenceStep.WEEKLY;
-        } else if (data.recurrence === Recurrence.BIWEEKLY) {
-          recurrenceStep = RecurrenceStep.BIWEEKLY;
-        } else {
-          recurrenceStep = RecurrenceStep.MONTHLY;
-        }
-
-        const recurrenceQuantity = Math.round(differenceInDays / recurrenceStep);
-        const id = Math.random().toString(36).substr(2, 9);
-
-        for (let i = 0; i <= recurrenceQuantity; i += 1) {
-          const newStartDate = new Date(sD);
-          newStartDate.setDate(sD.getDate() + i * recurrenceStep);
-
-          const eventData = {
-            ...data,
-            startsDate: newStartDate.toISOString().split('T')[0],
-            id: id,
-            recurrence: data.recurrence as Recurrence,
-          };
-          dispatch(addEvent(eventData));
-          reset(initialEventState);
-          setMarkedDates({});
-        }
+        dispatch(addEvent(data));
+        reset(initialEventState);
+        setMarkedDates({});
       }
     }
   };
@@ -148,14 +119,15 @@ export default function HomeScreen() {
     if (Object.keys(storedEventsToDisplay).includes(day.dateString)) {
       const selectedEvent = storedEvents.find((ev) => ev.startsDate === day.dateString);
       if (selectedEvent) {
-        Object.keys(selectedEvent).forEach((key) => {
-          setValue('eventName', selectedEvent.eventName);
-          setValue('recurrence', selectedEvent.recurrence);
-          setValue('startsDate', selectedEvent.startsDate);
-          setValue('endsDate', selectedEvent.endsDate);
-          setValue('startsTime', selectedEvent.startsTime);
-          setValue('endsTime', selectedEvent.endsTime);
+        reset({
+          eventName: selectedEvent.eventName,
+          recurrence: selectedEvent.recurrence,
+          startsDate: selectedEvent.startsDate,
+          endsDate: selectedEvent.endsDate,
+          startsTime: selectedEvent.startsTime,
+          endsTime: selectedEvent.endsTime,
         });
+        setValue('endsDate', selectedEvent.endsDate);
       }
       setSelectedEvent(storedEvents.find((ev) => ev.startsDate === day.dateString));
 
@@ -178,10 +150,22 @@ export default function HomeScreen() {
   };
 
   const removeEvent = (id: string, startsDate: string) => {
-    // console.log(selectedEvent);
     dispatch(deleteEvent({ id, startsDate }));
     setSelectedEvent(undefined);
+    reset(initialEventState);
   };
+
+  const dayPressStyles = (date: any, state: any) => {
+    const isSelectedSaved = !!storedEventsToDisplay[date.dateString];
+    const isSelectedMarked = !!markedDates[date.dateString];
+    return {
+      backgroundColor: isSelectedSaved ? 'blue' : isSelectedMarked ? 'orange' : 'white',
+      color: state === 'disabled' ? 'gray' : isSelectedSaved ? 'white' : 'black',
+    };
+  };
+
+  const isDisabledButton =
+    getValues('eventName') === '' || getValues('endsTime') === '' || getValues('startsTime') === '';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -190,33 +174,17 @@ export default function HomeScreen() {
         markingType={'period'}
         minDate={today}
         dayComponent={({ date, state }: { date: any; state: any }) => {
-          const isSelectedSaved = !!storedEventsToDisplay[date.dateString];
-          const isSelectedMarked = !!markedDates[date.dateString];
+          const { backgroundColor, color } = dayPressStyles(date, state);
           return (
             <Pressable onPress={() => onDayPress(date)} disabled={state === 'disabled'}>
-              <View
-                style={[
-                  styles.selectedDay,
-                  {
-                    backgroundColor: isSelectedSaved ? 'blue' : isSelectedMarked ? 'orange' : 'white',
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    color: state === 'disabled' ? 'gray' : isSelectedSaved ? 'white' : 'black',
-                  }}
-                >
-                  {date.day}
-                </Text>
+              <View style={[styles.selectedDay, { backgroundColor }]}>
+                <Text style={{ textAlign: 'center', verticalAlign: 'middle', color }}>{date.day}</Text>
               </View>
             </Pressable>
           );
         }}
       />
-      <View style={{ gap: 10, flex: 1, marginTop: 10 }}>
+      <View style={styles.mainContent}>
         <View style={{ marginBottom: 10 }}>
           <View style={styles.screenTitle}>
             <StyledText fontSize={12} fontWeight='600'>
@@ -226,7 +194,6 @@ export default function HomeScreen() {
               <TouchableOpacity
                 onPress={() => {
                   removeEvent(selectedEvent!.id, selectedEvent!.startsDate);
-                  reset(initialEventState);
                 }}
                 style={styles.createEventButtonWrapper}
               >
@@ -238,7 +205,7 @@ export default function HomeScreen() {
           </View>
           <Controller
             control={control}
-            rules={{ required: false }}
+            rules={{ required: true }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={{ ...styles.input, width: '100%' }}
@@ -250,13 +217,13 @@ export default function HomeScreen() {
             )}
             name='eventName'
           />
-          {errors.eventName && <Text style={styles.errorMessage}>This is required.</Text>}
+          <ErrorMessage error={errors.eventName} />
         </View>
         <View style={styles.dateWrapper}>
           <StyledText style={{ paddingRight: 55 }} fontSize={12} fontWeight='700'>
             Starts
           </StyledText>
-          <View style={{ flexDirection: 'row', gap: 15 }}>
+          <View style={styles.dateTimeContainer}>
             <Controller
               control={control}
               rules={{ required: false }}
@@ -271,8 +238,7 @@ export default function HomeScreen() {
               )}
               name='startsDate'
             />
-
-            {errors.startsDate && <Text style={styles.errorMessage}>This is required.</Text>}
+            <ErrorMessage error={errors.startsDate} />
             <Controller
               control={control}
               name='startsTime'
@@ -294,17 +260,17 @@ export default function HomeScreen() {
               )}
             />
 
-            {errors.startsTime && <Text style={styles.errorMessage}>This is required.</Text>}
+            <ErrorMessage error={errors.startsTime} />
           </View>
         </View>
         <View style={styles.dateWrapper}>
           <StyledText style={{ paddingRight: 40 }} fontSize={12} fontWeight='700'>
             Ends
           </StyledText>
-          <View style={{ flexDirection: 'row', gap: 15 }}>
+          <View style={styles.dateTimeContainer}>
             <Controller
               control={control}
-              rules={{ required: false }}
+              rules={{ required: true }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={{ ...styles.input, width: 120, position: 'relative' }}
@@ -316,7 +282,7 @@ export default function HomeScreen() {
               )}
               name='endsDate'
             />
-            {errors.endsDate && <Text style={styles.errorMessage}>This is required.</Text>}
+            <ErrorMessage error={errors.endsDate} />
             <View style={{ width: 120 }}>
               <Controller
                 control={control}
@@ -338,7 +304,7 @@ export default function HomeScreen() {
                 )}
               />
             </View>
-            {errors.endsTime && <Text style={styles.errorMessage}>This is required.</Text>}
+            <ErrorMessage error={errors.endsTime} />
           </View>
         </View>
 
@@ -349,7 +315,7 @@ export default function HomeScreen() {
           <Controller
             control={control}
             name='recurrence'
-            rules={{ required: false }}
+            rules={{ required: true }}
             render={({ field: { onChange, value } }) => (
               <DDPicker
                 open={openWeekItems}
@@ -379,11 +345,11 @@ export default function HomeScreen() {
             <Ionicons name='add' size={12} color='white' />
           </View>
           <StyledText fontSize={12} fontWeight='600'>
-            Create New Event
+            Create New Event (reset form)
           </StyledText>
         </TouchableOpacity>
         <StyledButton
-          disabled={getValues('eventName') === '' || getValues('endsTime') === '' || getValues('startsTime') === ''}
+          disabled={isDisabledButton}
           height={40}
           style={styles.button}
           color='#FFF'
@@ -403,6 +369,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 8,
+  },
+  mainContent: {
+    gap: 10,
+    flex: 1,
+    marginTop: 10,
   },
   screenTitle: {
     marginBottom: 10,
@@ -446,6 +417,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    gap: 15,
   },
   createEventButtonWrapper: {
     flexDirection: 'row',

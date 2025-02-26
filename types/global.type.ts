@@ -46,7 +46,7 @@ export interface DDPickerProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setPickedValue: (value: string | null) => void;
   onChangeValue?: (value: string | null) => void;
-  setItems: React.Dispatch<React.SetStateAction<any[]>>;
+  setItems: React.Dispatch<React.SetStateAction<{ label: string; value: string }[]>>;
   placeholder?: string;
   customStyles?: object;
 }
